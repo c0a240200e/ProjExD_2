@@ -99,8 +99,7 @@ def main():
         """
         移動量タプルに対応する画像Surfaceを返す関数
         """
-        return kk_img_dict.get(sum_mv, kk_img_dict[(0, 0)])
-    
+        return kk_img_dict.get(sum_mv, kk_img_dict[(0, 0)]) 
 
 
     while True:
