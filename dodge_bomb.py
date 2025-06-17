@@ -2,10 +2,11 @@ import os
 import sys
 import pygame as pg
 import random
+import time
 
 
 WIDTH, HEIGHT = 1100, 650
-DELTA = {
+DELTA = {           
     pg.K_UP:(0,-5),
     pg.K_DOWN:(0,5),
     pg.K_LEFT:(-5,0),  
@@ -42,12 +43,37 @@ def main():
     bb_rct.centery =random.randint(0,HEIGHT)
     vx = +5#爆弾の移動速度
     vy = +5
+    gg_img = pg.Surface((WIDTH, HEIGHT))
+    pg.draw.rect(gg_img, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
+    gg_img.set_alpha(50) 
+    gg_rct = gg_img.get_rect()
+    gg_rct.center = (WIDTH / 2, HEIGHT / 2)  # 半透明の黒背景
+    kc_img = pg.image.load("fig/8.png")
+    kc_rct1 = kc_img.get_rect()
+    kc_rct1.center = (350, HEIGHT / 2) # 左のこうかとんの位置
+    kc_rct2 = kc_img.get_rect()
+    kc_rct2.center = (WIDTH - 350, HEIGHT / 2) # 右のこうかとんの位置
+    fonto = pg.font.Font(None, 80)
+    text = fonto.render("GAME OVER", True, (255, 255, 255))# ゲームオーバーのテキスト
+    text_rect = text.get_rect()
+    text_rect.center = (WIDTH / 2, HEIGHT / 2)# テキストの位置を画面中央に設定
     clock = pg.time.Clock()
     tmr = 0
+    def gameover(screen: pg.Surface) -> None:
+        screen.blit(kc_img,kc_rct1)
+        screen.blit(kc_img,kc_rct2)
+        screen.blit(gg_img, gg_rct)
+        screen.blit(text, text_rect)
+        pg.display.update()
+        time.sleep(5)
+
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
+        if kk_rct.colliderect(bb_rct):
+            gameover(screen)
+            return
         screen.blit(bg_img, [0, 0]) 
 
         key_lst = pg.key.get_pressed()
@@ -56,14 +82,6 @@ def main():
             if key_lst[key]:
                 sum_mv[0] += mv[0]
                 sum_mv[1] += mv[1]
-        # if key_lst[pg.K_UP]:
-        #     sum_mv[1] -= 5
-        # if key_lst[pg.K_DOWN]:
-        #     sum_mv[1] += 5
-        # if key_lst[pg.K_LEFT]:
-        #     sum_mv[0] -= 5
-        # if key_lst[pg.K_RIGHT]:
-        #     sum_mv[0] += 5
         kk_rct.move_ip(sum_mv)
         if check_bound(kk_rct) != (True,True):
             kk_rct.move_ip(-sum_mv[0],-sum_mv[1])
@@ -73,6 +91,7 @@ def main():
             vx *= -1
         if not tate:
             vy *= -1
+
         screen.blit(kk_img, kk_rct)
         screen.blit(bb_img,bb_rct)
         pg.display.update()
