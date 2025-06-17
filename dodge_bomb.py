@@ -12,6 +12,19 @@ DELTA = {
     pg.K_RIGHT:(5,0),
 }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+def check_bound(rct: pg.Rect) -> tuple[bool,bool]:
+    """
+    引数：こうかとんRectまたは爆弾Rect
+    戻り値：横方向、縦方向の画面内外判定結果
+    画面内ならTrue, 画面外ならFalse
+
+    """
+    yoko,tate = True,True #初期値：画面の中
+    if rct.left < 0 or rct.right > WIDTH:
+        yoko = False
+    if rct.top < 0 or rct.bottom > HEIGHT:
+        tate = False
+    return yoko,tate #画面の中ならTrue, 画面外ならFalse
 
 
 def main():
@@ -31,8 +44,6 @@ def main():
     vy = +5
     clock = pg.time.Clock()
     tmr = 0
-    
-
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
@@ -54,7 +65,14 @@ def main():
         # if key_lst[pg.K_RIGHT]:
         #     sum_mv[0] += 5
         kk_rct.move_ip(sum_mv)
+        if check_bound(kk_rct) != (True,True):
+            kk_rct.move_ip(-sum_mv[0],-sum_mv[1])
         bb_rct.move_ip(vx,vy)
+        yoko, tate = check_bound(bb_rct)
+        if not yoko:#横方向にはみ出たら
+            vx *= -1
+        if not tate:
+            vy *= -1
         screen.blit(kk_img, kk_rct)
         screen.blit(bb_img,bb_rct)
         pg.display.update()
